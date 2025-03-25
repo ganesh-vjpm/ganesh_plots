@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Dashboard </title>
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.3/dist/echarts.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container_chart {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+
+        }
+
+        .chart_data {
+            min-width: 48%;
+            box-sizing: border-box;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        select {
+            padding: 5px;
+            margin-top: 10px;
+            border-radius: 7mm;
+            border: 1px solid #626762;
+            width: 15%;
+            height: 30px;
+        }
+        
+        .chart {
+            flex: 1;
+            min-width: 45%;
+            height: 450px;
+            background-color: rgb(239, 249, 234);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .container_table{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .table_data{
+            min-width: 48%;
+            box-sizing: border-box;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+         
+        .table_data h2{
+            color: rgb(15, 13, 13);
+        }
+        .table_data h3{
+            color: black;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+
+        }
+
+        th {
+            background-color: rgb(231, 207, 207);
+            color: rgb(15, 17, 17);
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #eff4f5;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <h1>All charts</h1>
+
+    <div class="container_chart">
+
+        {% for plot_key,plot_value in content.plot_data.items %}
+
+        <div class="chart_data">
+
+            <h2>{{plot_value.plot_title}}</h2>
+
+            <div class="form-group" >
+            
+                <select name="plot_select" id="plot_type_{{ forloop.counter0 }}" onchange="update_plot_type({{ forloop.counter0 }})">
+
+                    <option value = "line" selected>   line  </option>
+                    <option value = "bar"          >   bar   </option>
+                    <option value = "pie"          >   pie   </option>
+                    <option value = "scatter"      > scatter </option>
+                </select>
+
+            </div>
+
+            <div class="chart" id="chart{{ forloop.counter0 }}" style="height: 550px; width: 100%; background-color:rgb(239, 249, 234);" ></div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+    
+    <script>
+
+        window.onload = function() {
+            {% for plot_key, plot_value in content.plot_data.items %}
+
+                update_plot_type({{ forloop.counter0 }});
+                
+            {% endfor %}
+        }
+
+        function update_plot_type(plot_index){            
+
+            {% for plot_key, plot_value in content.plot_data.items %}
+
+            if ({{ forloop.counter0}} === plot_index) {
+
+                (function(){
+
+                    var select_plot_type = document.getElementById('plot_type_'+ plot_index).value;
+
+                    var chart_container_id = 'chart'+ plot_index;
+
+                    var chartDom = document.getElementById(chart_container_id);
+                    var plots = echarts.init(chartDom);
+                    
+                    var plot_title = "{{ plot_value.plot_title }}";
+                    var x_name     = "{{ plot_value.x_name }}";
+                    var y_name     = "{{ plot_value.y_name }}";
+                    var x_data     = {{ plot_value.x_data|safe }};
+                    var y_data     = {{ plot_value.y_data|safe }};
+
+                    var option = {
+
+                        title: {
+                            text: plot_title,
+                        },
+
+                        tooltip:{
+                            trigger:'axis',
+                            axisPointer: {type: 'cross'}
+                        },
+
+                        xAxis: {
+                            type:'category',
+                            data: x_data,
+                            name: x_name
+                        },
+
+                        yAxis: {
+                            type: 'value',
+                            name:y_name
+                        },
+
+                        legend: {
+                            top: '0%',
+                            right:'0%',
+                            orient: 'vertical',
+                            textStyle:{
+                                fontSize: 8,
+                            },
+                          },
+
+                        series: [{
+                            data: y_data,
+                            type: select_plot_type,
+                            name:'scale'
+                        }]
+
+                    };
+
+                    if (select_plot_type === 'pie') {
+                        
+                        option.series[0].type   = 'pie';
+                        option.series[0].radius = '55%';
+
+                        option.series[0].data = x_data.map(function (item, index) {
+
+                            return { value: y_data[index], name: item };
+
+                        });
+
+                        option.tooltip.trigger = 'item';
+                        option.tooltip.formatter = '{b}: {c} ({d}%)';
+                    
+                        option.series[0].label = {
+                            show: true,
+                            formatter: '{b}: {d}%'
+                        };
+                    
+                    }
+
+                    else {
+                        option.tooltip.trigger = 'axis';
+                        option.tooltip.formatter = function (params) {
+                           
+                            var tool_tip_content = params[0].name + '<br/>';
+                            params.forEach(function (param) {
+                                tool_tip_content += param.seriesName + ': ' + param.value + '<br/>';
+                            });
+                            return tool_tip_content;
+                        };
+                    }
+
+                    plots.setOption(option)
+
+                })();
+            }
+
+            {% endfor %}
+
+        }
+
+    </script>
+
+    <h1>All data in table</h1>
+
+    <div class="container_table">
+
+        {% for table_title, table_data in content.chart_data.items %}
+
+        <div class="table_data" >
+
+            <h2>  {{ table_data.title }} table </h2>
+            <h3>  {{ table_data.data|safe }}   </h3>
+
+        </div>
+
+        {% endfor %}
+        
+    </div>
+
+</body>
+</html>
