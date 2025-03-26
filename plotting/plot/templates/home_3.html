@@ -1,0 +1,76 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.3/dist/echarts.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+</head>
+
+<body>
+
+    <h1>All charts</h1>
+
+    <div class="container_chart">
+
+        {% for plot_key, plot_value in content.plot_data.items %}
+
+        <div class="chart_data">
+
+            <h2>{{ plot_value.plot_title }}</h2>
+
+            <div class="form-group">
+
+
+                <!-- <select name="plot_select" id="plot_type_{{ forloop.counter0 }}" onchange="update_plot_type({{ forloop.counter0 }})">
+                    <option value="line" selected>line</option>
+                    <option value="bar">bar</option>
+                    <option value="pie">pie</option>
+                    <option value="scatter">scatter</option>
+                </select> -->
+
+
+                    <div class="btn-group" id="plot_type_tabs_{{ forloop.counter0 }}" role="group" aria-label="Plot Type">
+                        <button type="button" class="btn btn-primary" id="line_btn_{{ forloop.counter0 }}" onclick="update_plot_type({{ forloop.counter0 }}, 'line')">Line</button>
+                        <button type="button" class="btn btn-primary" id="bar_btn_{{ forloop.counter0 }}" onclick="update_plot_type({{ forloop.counter0 }}, 'bar')">Bar</button>
+                        <button type="button" class="btn btn-primary" id="pie_btn_{{ forloop.counter0 }}" onclick="update_plot_type({{ forloop.counter0 }}, 'pie')">Pie</button>
+                        <button type="button" class="btn btn-primary" id="scatter_btn_{{ forloop.counter0 }}" onclick="update_plot_type({{ forloop.counter0 }}, 'scatter')">Scatter</button>
+                    </div>
+
+
+            </div><br>
+
+            <button type="button" id="loadTable{{ forloop.counter0 }}" onclick="table_in_newtab({{ forloop.counter0 }})">Load Table</button><br>
+
+            <div class="chart" id="chart{{ forloop.counter0 }}" style="height: 550px; width: 100%; background-color:rgb(239, 249, 234);"></div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <div id="table_container"></div>
+    
+    
+    <h1>All data in table</h1>
+
+    <div class="container_table">
+        {% for table_title, table_data in content.chart_data.items %}
+        <div class="table_data">
+            <h2>{{ table_data.title }} table</h2>
+            <h3>{{ table_data.data|safe }}</h3>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

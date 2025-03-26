@@ -2,6 +2,7 @@ import pandas as pd
 
 from django.shortcuts import render
 from .models import Area_plot,Bar_plot, Box_plot, Histogram_plot, Heatmap_plot, Line_plot,  Pie_plot, Radar_plot, Scatter_plot, StackedBar_plot
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -170,7 +171,199 @@ def db_table9():
     return x_axis, y_axis, table_title, table9, x_lables, y_lables
 
 
+
+
+def plot_table0(request):
+
+    data0 = StackedBar_plot.objects.all()
+
+    quater     =  [ obj.quater      for obj in data0 ]
+    electronics = [ obj.electronics for obj in data0 ]
+    furniture   = [ obj.furniture   for obj in data0 ]
+    clothing    = [ obj.clothing    for obj in data0 ]
+    total       = [ obj.total       for obj in data0 ]
+
+    table0 = pd.DataFrame({'Quarter': quater, 'Electronics': electronics, 'Furniture': furniture, 'Clothing': clothing, 'Total': total}).to_dict(orient='records')
+    
+    response_data = {
+        'status': 'ok',  
+        'data': table0,  }
+    return JsonResponse(response_data)
+
+    # return JsonResponse({'x_axis': x_axis,'y_axis':y_axis , 'table_title':table_title, 'table':table0, 'x_lables':x_lables, 'y_lables':y_lables})
+
+
+def plot_table1(request):
+    
+    data1 = Line_plot.objects.all()
+    month = [ obj.month for obj in data1 ]
+    sales = [ obj.sales for obj in data1 ]
+
+    table1 = pd.DataFrame({'Month': month, 'Sales': sales}).to_dict(orient='records')
+
+    x_axis, y_axis= month, sales
+    table_title, x_lables, y_lables = 'Monthly Sales', 'Month', 'Sales'
+
+    response_data = {
+        'status': 'ok',  
+        'data': table1,  }
+    return JsonResponse(response_data)
+
+
+
+def plot_table2(request):
+
+    data2 = Bar_plot.objects.all()
+
+    department = [obj.department for obj in data2]
+    revenues = [obj.revenue for obj in data2]
+
+    table2 = pd.DataFrame({'Department': department, 'Revenues': revenues}).to_dict(orient='records')
+
+    response_data = {
+        'status': 'ok',  # Success status
+        'data': table2,  # The table data
+    }
+
+    return JsonResponse(response_data)
+
+
+
+
+def plot_table3(request):
+
+    data3 = Radar_plot.objects.all()
+
+    aspect = [ obj.aspect for obj in data3 ]
+    score  = [ obj.score  for obj in data3 ]
+
+    table3 = pd.DataFrame({'Aspect': aspect, 'Score': score}).to_dict(orient='records')
+
+    response_data = {
+        'status': 'ok', 
+        'data': table3,
+    }
+
+    return JsonResponse(response_data)
+
+
+def plot_table4(request):
+
+    data4 = Scatter_plot.objects.all()
+
+    hours_studied = [ obj.hoursstudied for obj in data4 ]
+    exam_scores   = [ obj.examscore    for obj in data4 ]
+
+    table4 = pd.DataFrame({'Hours': hours_studied, 'Exam score': exam_scores}).to_dict(orient='records')
+
+    response_data = {
+        'status' : 'ok',
+        'data' : table4,
+    }
+
+    return JsonResponse(response_data)
+
+
+def plot_table5(request):
+
+    data5 = Area_plot.objects.all()
+
+    month        = [ obj.month       for obj in data5 ]
+    new_customer = [ obj.newcustomer for obj in data5 ]
+    old_customer = [ obj.oldcustomer for obj in data5 ]
+
+
+    table5 = pd.DataFrame({'Month': month, 'New customers': new_customer, 'Old customers': old_customer}).to_dict(orient='records')
+
+    response_data = {
+        'status' : 'ok',
+        'data' : table5,
+    }
+
+    return JsonResponse(response_data)
+
+
+def plot_table6(request):
+
+    data6 = Pie_plot.objects.all()
+
+    companies = [ obj.company     for obj in data6 ]
+    sales     = [ obj.marketshare for obj in data6 ]
+
+    table6 = pd.DataFrame({'Company': companies, 'Sales': sales}).to_dict(orient='records')
+   
+
+    response_data = {
+        'status' : 'ok',
+        'data' : table6,
+    }
+
+    return JsonResponse(response_data)
+
+
+def plot_table7(request):
+
+    data7 = Heatmap_plot.objects.all()
+
+    region = [ obj.region   for obj in data7 ]
+    jan    = [ obj.january  for obj in data7 ]
+    feb    = [ obj.february for obj in data7 ]
+    mar    = [ obj.march    for obj in data7 ]
+    apl    = [ obj.april    for obj in data7 ]
+    may    = [ obj.may      for obj in data7 ]
+
+    table7 = pd.DataFrame({'Region': region, 'Jan': jan, 'Feb': feb, 'Mar': mar, 'Apr': apl, 'May': may}).to_dict(orient='records')
+
+
+    response_data = {
+        'status' : 'ok',
+        'data' : table7,
+    }
+
+    return JsonResponse(response_data)
+
+
+def plot_table8(request):
+
+    data8 = Box_plot.objects.all()
+
+    department = [ obj.department for obj in data8 ]
+    mean       = [ obj.mean       for obj in data8 ]
+    median     = [ obj.median     for obj in data8 ]
+    maxi       = [ obj.max        for obj in data8 ]
+    q1         = [ obj.q1         for obj in data8 ]
+    q2         = [ obj.q2         for obj in data8 ]
+
+    table8 = pd.DataFrame({'Department': department, 'Mean': mean, 'Q1': q1, 'Median': median, 'Q2': q2, 'Maximum': maxi}).to_dict(orient='records')
+
+    response_data = {
+        'status' : 'ok',
+        'data' : table8,
+    }
+
+    return JsonResponse(response_data)
+
+
+def plot_table9(request):
+
+    data9 = Histogram_plot.objects.all()
+
+    age_groups = [ obj.agegroup  for obj in data9 ]
+    customers  = [ obj.customers for obj in data9 ]
+
+    table = pd.DataFrame({'Age groups': age_groups, 'Customers': customers}).to_dict(orient='records')
+
+
+    response_data = {
+        'status' : 'ok',
+        'data' : table,
+    }
+
+    return JsonResponse(response_data)
+
+
 def home(request):
+
 
     x0_axis, y0_axis, table0_title, table0_data, x0_lables, y0_lables=db_table0()
     x1_axis, y1_axis, table1_title, table1_data, x1_lables, y1_lables=db_table1()
@@ -214,5 +407,4 @@ def home(request):
         'chart_data':chart_data,
         'plot_data':plot_data
     }
-
-    return render(request,'home.html',{'content':content})
+    return render(request,'table.html',{'content':content})
